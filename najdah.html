@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>نجدة | Najdah Pro System</title>
+  <meta name="theme-color" content="#0d1117">
+  
+  <!-- الخطوط -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- ربط ملف التنسيق الخارجي -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="network-badge online" id="netStatus">
+    <span class="status-dot"></span>
+    <span id="netStatusText">النظام متصل وجاهز للاستجابة السحابية والفورية</span>
+  </div>
+
+  <header>
+    <div class="brand-title">
+      <span class="pulse-dot"></span>
+      نجدة | Najdah
+    </div>
+    <div class="brand-slogan">خطوة صحيحة… في الوقت المناسب</div>
+  </header>
+
+  <main class="container">
+    
+    <!-- خطوط الاتصال الساخنة المباشرة -->
+    <div class="emergency-dial-grid">
+      <a href="tel:997" class="dial-card">
+        <span class="agency">الهلال الأحمر</span>
+        <span class="number">997</span>
+      </a>
+      <a href="tel:998" class="dial-card">
+        <span class="agency">الدفاع المدني</span>
+        <span class="number">998</span>
+      </a>
+      <a href="tel:993" class="dial-card">
+        <span class="agency">المرور</span>
+        <span class="number">993</span>
+      </a>
+      <a href="tel:911" class="dial-card">
+        <span class="agency">العمليات 911</span>
+        <span class="number">911</span>
+      </a>
+    </div>
+
+    <!-- مؤقت الاستجابة للحالة مع خانة التدوين الشخصية -->
+    <div class="chrono-widget">
+      <div class="chrono-header">
+        <div>
+          <div style="font-size: 0.8rem; font-weight:700; color:var(--text-muted);">⏱️ مؤقت الاستجابة للحالة:</div>
+          <div class="chrono-display" id="chronoTimer">00:00</div>
+        </div>
+        <div class="chrono-controls">
+          <button class="chrono-btn" id="chronoToggleBtn" onclick="toggleChrono()">بدء المؤقت</button>
+          <button class="chrono-btn" onclick="resetChrono()">إعادة</button>
+        </div>
+      </div>
+
+      <div class="chrono-custom-input-wrap">
+        <input type="text" id="customChronoEvent" placeholder="اكتب ملاحظة أو إجراء (مثال: حقن إبرة، تنظيف جرح، فحص نبض)..." onkeydown="if(event.key === 'Enter') logCustomChronoEvent()">
+        <button class="chrono-add-btn" onclick="logCustomChronoEvent()">+ تسجيل بالوقت</button>
+      </div>
+
+      <div class="chrono-quick-tags">
+        <button class="tag-btn" onclick="logChronoEvent('بدء إنعاش CPR')">+ بدء CPR</button>
+        <button class="tag-btn" onclick="logChronoEvent('إعطاء جرعة سكر')">+ جرعة سكر</button>
+        <button class="tag-btn" onclick="logChronoEvent('استعادة الوعي')">+ استعاد الوعي</button>
+        <button class="tag-btn" onclick="logChronoEvent('فقدان الوعي ')">+ فقدان الوعي </button>
+        <button class="tag-btn" onclick="logChronoEvent(' رباط الضغط ')">+ رباط الضغط </button>
+    </div>
+
+      <div class="chrono-log-list" id="chronoLogList">
+        <div style="text-align: center; color: var(--text-muted);">سجل الأحداث يوثق خطواتك التمريضية للمسعف...</div>
+      </div>
+    </div>
+
+    <!-- مبدل الفئات العمرية الثلاث -->
+    <div class="age-selector-card">
+      <button class="age-pill active" id="ageAdult" onclick="setAgeCategory('adult')">👨 بالغ (12+ سنة)</button>
+      <button class="age-pill" id="ageChild" onclick="setAgeCategory('child')">🧒 طفل (1 - 12 سنة)</button>
+      <button class="age-pill" id="ageInfant" onclick="setAgeCategory('infant')">👶 رضيع (أقل من سنة)</button>
+    </div>
+
+    <!-- مستشار الإنقاذ الصوتي والذكي -->
+    <section class="ai-assistant-card">
+      <div class="ai-header">
+        <div class="ai-title">
+          <span>🧠</span> مستشار الإنقاذ الصوتي والذكي
+        </div>
+        <span class="ai-badge">استجابة فورية</span>
+      </div>
+      <div class="ai-input-wrap">
+        <input type="text" id="aiQuery" placeholder="صف الحالة أو ما تشاهده (غصة، ينزف دم، ضربة شمس، ملدوغ)..." onkeydown="if(event.key === 'Enter') processTriage()">
+        <button class="icon-action-btn" id="voiceBtn" title="تحدث صوتياً" onclick="toggleVoiceInput()">🎙️</button>
+        <button class="ai-submit-btn" id="aiBtn" onclick="processTriage()">إسعاف</button>
+      </div>
+
+      <div class="ai-output-box" id="aiOutput"></div>
+    </section>
+
+    <!-- بندول إيقاع الإنعاش القلبي الرئوي CPR -->
+    <section class="cpr-tool-card">
+      <div>
+        <h4 style="font-size:1rem; font-weight:800;" id="cprTitleText">إيقاع ضغطات الصدر (للبالغين)</h4>
+        <p style="font-size:0.8rem; color:var(--text-muted);" id="cprSubText">بكعب اليدين بمنتصف الصدر (عمق 5-6 سم)</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="beat-circle" id="cprIndicator">●</div>
+        <button class="cpr-btn" id="cprBtn" onclick="toggleCPR()">تشغيل</button>
+      </div>
+    </section>
+
+    <!-- محرك البحث والفلترة الشامل -->
+    <section class="search-wrapper">
+      <div class="search-input-box">
+        <input type="text" id="protocolFilter" placeholder="ابحث بالاسم، أو الكلمات الدارجة (غصة، شرق، كهرباء، غرق، ضربة شمس)..." oninput="filterProtocols()">
+        <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
+      </div>
+
+      <div class="filter-chips-container" id="filterChips">
+        <button class="filter-chip active" data-category="all" onclick="selectCategory('all', this)">🌐 كافة الحالات (35)</button>
+        <button class="filter-chip" data-category="respiratory" onclick="selectCategory('respiratory', this)">🫁 تنفسية واختناق</button>
+        <button class="filter-chip" data-category="trauma" onclick="selectCategory('trauma', this)">🩸 حوادث ورضوض</button>
+        <button class="filter-chip" data-category="cardio" onclick="selectCategory('cardio', this)">❤️‍🩹 قلب وأعصاب</button>
+        <button class="filter-chip" data-category="internal" onclick="selectCategory('internal', this)">🧪 تسمم وباطنية</button>
+        <button class="filter-chip" data-category="environmental" onclick="selectCategory('environmental', this)">🦂 بيئية وحرارية</button>
+      </div>
+
+      <div class="search-stats">
+        <span id="matchCountText">عرض كافة البروتوكولات المعتمدة (35 حالة حاسمة)</span>
+        <span style="color:var(--accent);">⚡ محرك الفهرسة الشامل</span>
+      </div>
+    </section>
+
+    <!-- بنك البروتوكولات الإسعافية (35 حالة حاسمة) -->
+    <div class="cases-accordion" id="protocolsList">
+      
+      <!-- 1. الغصة والاختناق -->
+      <article class="case-card" data-category="respiratory" 
+        data-keywords="غصة اختناق بلع تنفس هيمليك زورق شرق شرقان عظمة شوكة لقمه انسداد مجرى الهواء مكتوم كتمه يلهث ازرقاق الشفاه صوت صفير ما يتنفس بلع جسم كحة قوية">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🫁</span>
+            <span id="chokingTitle">الغصة وانسداد مجرى التنفس (Choking)</span>
+            <span class="case-badge-tag">تنفسية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body" id="chokingBody">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">شجّع المصاب على السعال بقوة ما دام يصدر صوتاً؛ السعال هو أقوى آلية لطرد العالق.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إذا اختفى الصوت وأشار لعنقه: وجّه جذعه للأمام واضربه 5 ضربات متتالية بين لوحي الكتف بكعب يدك.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">قف خلفه، ضع قبضة يدك فوق السرة مباشرة، واضغط للداخل وللأعلى (مناورة هيمليك) 5 مرات.</div></div>
+          <div class="caution-note">⚠️ إذا سقط المصاب فاقداً للوعي، ضعه مستلقياً على الأرض فوراً وابدأ إنعاش الصدر (CPR).</div>
+        </div>
+      </article>
+
+      <!-- 2. النزيف الشديد -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="نزيف دم جرح قطع شريان طعن سكين نافورة دم ينزف ينزف دم جرح عميق شق طعنة قزاز زجاج جرح مفتوح تدفق الدم تورنيكيه شاش ضغط دموي رصاصة خبطة">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🩸</span>
+            <span>النزيف الخارجي الحاد (Severe Bleeding)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">اضغط مباشرة وبكامل ثقلك فوق موضع النزيف بقماش معقم أو قطعة ملابس نظيفة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إذا تشبع القماش بالدم لا تنزعه، بل ضع ضمادة إضافية فوقه واستمر في الضغط الثابت المتصل.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">سجّل وقت وضع رباط الضغط بالمؤقت أعلاه وأبلغ المسعف فور وصوله.</div></div>
+          <div class="caution-note">⚠️ لا تنزع السكاكين أو الأجسام المغروسة إطلاقاً؛ ثبّتها بضمادات جانبية حتى وصول الجراحة.</div>
+        </div>
+      </article>
+
+      <!-- 3. الحروق -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="حرق حروق نار ماء غليان يغلي حار زيت شمس سلق لهب  نيران  موقد بتقاز  فرن غاز انفجار كهرباء التماس ماء مغلي انكب عليه حرارية احمرار فقعات جلد متقشر كيماويات شحم حار">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🔥</span>
+            <span>الحروق السطحية والعميقة (Burns)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">برّد مكان الحرق فوراً بماء جارٍ فاتر (15 - 25 درجة مئوية) لمدة 15 إلى 20 دقيقة متواصلة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">انزع الخواتم والأساور والملابس غير الملتصقة بالجلد قبل حدوث التورم.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">غطِّ الحرق برفق بشاش معقم غير لاصق أو كيس نايلون مخصص ونظيف لمنع التلوث.</div></div>
+          <div class="caution-note">⚠️ تجنب تماماً الثلج، معجون الأسنان، أو الدهون؛ فهي تحبس الحرارة وتضاعف تلف الأنسجة.</div>
+        </div>
+      </article>
+
+      <!-- 4. الاشتباه بجلطة قلبية -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="قلب جلطة صدر ذبحة صدرية نوبة قلبية نوبه جلطه ألم كتف كتمة ثقل بالصدر وجع بالقلب ماسك صدره عرق بارد استفراغ فك اسبرين توقف النبض نغزات صعوبة تنفس دوار ">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>❤️‍🩹</span>
+            <span>الاشتباه في نوبة أو جلطة قلبية (Heart Attack)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">الأعراض: ألم ضاغط كالثقل بمنتصف الصدر يمتد للكتف أو الفك مع تعرق وغثيان.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">أجلس المريض في وضعية نصف جالس لتخفيف الجهد عن عضلة القلب.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">اطلب الإسعاف فوراً (997) ودعه يمضغ حبة أسبرين إن لم تكن لديه حساسية.</div></div>
+          <div class="caution-note">⚠️ لا تسمح للمريض بالمشي أو القيادة، وكن مستعداً للإنعاش القلبي فور فقدان الوعي.</div>
+        </div>
+      </article>
+
+      <!-- 5. السكتة الدماغية -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="سكتة دماغية مخ شلل وجه ثقل لسان ميلان الفم فمه مايل يده طايحة ما يقدر يتكلم كلام مخربط مفلوج فجأة ضعف نصفي فقدان توازن صداع مفاجئ شديد فاست fast جلطة بالراس">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🧠</span>
+            <span>الاشتباه بالسكتة الدماغية (Stroke / FAST)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">افحص الوجه (ميلان بالابتسامة)، والذراعين (سقوط طرف)، والكلام (ثقل وتداخل).</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">سجّل وقت بدء الأعراض فوراً عبر مؤقت الحادث بالأعلى لتقديمه لطبيب الطوارئ.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">أبقِ المريض مستلقياً مع رفع الرأس قليلاً واطلب الإسعاف 997.</div></div>
+          <div class="caution-note">⚠️ لا تقدم أي طعام أو شراب أو أدوية هاتفياً؛ خوفاً من الاختناق بالرئة.</div>
+        </div>
+      </article>
+
+      <!-- 6. نوبات الصرع والتشنجات -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="صرع تشنج هزات نوبة رعشة كهرباء مخ يرتعش يتنافض يابس متخشب رغوة بالفم فاقد وعي عض لسانه صرعي ينتفض عيونه فوق تشنجات حرارية اطفال">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>⚡</span>
+            <span>نوبات الصرع والتشنجات (Seizures)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">أمّن المحيط فوراً وأبعد الأثاث الحاد والزجاج من حول المصاب.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">ضع وسادة أو سترة لينة تحت رأسه، وفك الأزرار المشدودة حول عنقه.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">سجّل وقت النوبة بالمؤقت، واقلبه على جنبه فور توقف الرعشات لفتح مجرى الهواء.</div></div>
+          <div class="caution-note">⚠️ لا تضع أي شيء داخل فمه ولا تحاول كبح حركته؛ فاللسان لا يُبتلع.</div>
+        </div>
+      </article>
+
+      <!-- 7. غيبوبة وهبوط السكر -->
+      <article class="case-card" data-category="internal" 
+        data-keywords="سكر هبوط غيبوبة أنسولين دايخ تعرق رعشة سكري انخفاض السكر دايخ يرجف بارد شاحب جوع شديد تلعثم ما يركز فاقد الوعي سكر طايح ابرة أنسولين">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🍬</span>
+            <span>هبوط السكر الحاد (Hypoglycemia)</span>
+            <span class="case-badge-tag">باطنية وتسمم</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">إن كان واعياً: قدّم له نصف كوب عصير، ملعقة عسل، أو ماء محلى بالسكر.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">انتظر 15 دقيقة ثم افحص وعيه أو مستوى السكر ثانية.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">سجّل التوقيت بنقرة زر "+ جرعة سكر" أعلاه.</div></div>
+          <div class="caution-note">⚠️ إن كان فاقداً للوعي لا تسكب أي سوائل في حلقه؛ ضعه على جنبه واطلب الإسعاف.</div>
+        </div>
+      </article>
+
+      <!-- 8. الكسور وإصابات العمود الفقري -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="كسر عظم التواء حادث سقوط رض ركبة رقبة طاح من فوق صدم سيارة عظم طالع كسر مضاعف التوى كاحل رجل يد مكسورة مخلوع مفكوك رضوض لا تحركه نخاع شوكي">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🦴</span>
+            <span>الكسور وإصابات العمود الفقري (Fractures & Trauma)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">ثبّت الطرف المكسور في موضعه ولا تحاول رد العظام إطلاقاً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">اصنع جبيرة مؤقتة بواسطة وسادة أو كرتون واربطها برفق فوق وتحت الكسر.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">في حوادث السقوط والسيارات ثبّت الرأس والرقبة بكلتا يديك ومنعه من التحرك.</div></div>
+          <div class="caution-note">⚠️ لا تحرك المصاب من مكانه إلا في حال وجود خطر داهم كالحريق.</div>
+        </div>
+      </article>
+
+      <!-- 9. التسمم وابتلاع المواد الكاوية -->
+      <article class="case-card" data-category="internal" 
+        data-keywords="تسمم منظف كلور دواء شرب صابون مبيد فلاش كلوركس صابون غسيل طفل شرب ديتول مادة كيميائية بترول جاز قرص غسالة جرعة زائدة ادوية سم فئران كبسولات">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🧪</span>
+            <span>التسمم وابتلاع المواد الكاوية (Poisoning)</span>
+            <span class="case-badge-tag">باطنية وتسمم</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">حدّد المادة المتناولة والكمية التقريبية واحتفظ بالعبوة للمسعف.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">امسح بقايا المادة من فمه واغسل وجهه إن تناثرت عليه.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">اتصل بالإسعاف (997) أو مركز السموم فوراً.</div></div>
+          <div class="caution-note">⚠️ إياك أن تجبر المصاب على التقيؤ؛ فالقيء يحرق المريء للمرة الثانية.</div>
+        </div>
+      </article>
+
+      <!-- 10. لدغات العقارب والأفاعي -->
+      <article class="case-card" data-category="environmental" 
+        data-keywords="لدغة عقرب ثعبان حية سم قرصة حشرة مقروص ملدوغ داب بر سموم صحراء نزهة كشتة تورم مكان العضة اثر انياب الم شديد انتفاخ ازرقاق برودة طرف">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🦂</span>
+            <span>لدغات العقارب والأفاعي (Bites & Stings)</span>
+            <span class="case-badge-tag">بيئية وحرارية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">هدئ المصاب تماماً واطلب منه السكون للحد من انتشار السم في الدم.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">أبقِ الطرف الملدوغ أخفض من مستوى القلب وانزع الخواتم أو الأساور فوراً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">اغسل موضع اللدغة بالماء والصابون وانقله للطوارئ على الفور.</div></div>
+          <div class="caution-note">⚠️ لا تجرح موضع اللدغة، ولا تمص السم، ولا تربط الطرف بحبل قاطع للشرايين.</div>
+        </div>
+      </article>
+
+      <!-- 11. ضربة الشمس والإجهاد الحراري -->
+      <article class="case-card" data-category="environmental" 
+        data-keywords="ضربة شمس حرارة عالية صيف شمس حارة حر شمس تعرق شديد دوخة شمس سخونة دوار عطش جفاف هبوط شمس حج عمرة مشي بالشمس توقف التعرق هذيان">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>☀️</span>
+            <span>ضربة الشمس والإجهاد الحراري (Heat Stroke)</span>
+            <span class="case-badge-tag">بيئية وحرارية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">انقل المصاب فوراً إلى مكان مظلل، بارد أو مكيف، واطلب الإسعاف إذا كان الجلد حاراً وجافاً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">انزع الملابس الثقيلة، ورش جسمه برذاذ ماء فاتر مع التهوية المباشرة بالمروحة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">ضع كمادات باردة تحت الإبطين والرقبة وبين الفخذين؛ هذه المناطق تسرع تبريد الأوعية الدموية.</div></div>
+          <div class="caution-note">⚠️ لا تسقِه ماءً مثلجاً دفعة واحدة ولا تعطِه سوائل إن كان مشوشاً أو فاقداً للوعي.</div>
+        </div>
+      </article>
+
+      <!-- 12. الصعق والتكهرب -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="كهرباء تكهرب صعق التماس سلك عريان فيش شاحن صعقة كهربائية تيار كهربائي مسكته الكهرباء صعق في الحمام غسالة كهربائية سلك مقطوع">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>⚡</span>
+            <span>الصعق والتيار الكهربائي (Electric Shock)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">لا تلمس المصاب بيدك المجردة إطلاقاً وهو متصل بالتيار الكهربائي.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">افصل القاطع الرئيسي فوراً، أو ادفعه بأداة عازلة تماماً (عصا خشبية جافة، مكنسة، كرتون سميك).</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">بمجرد عزله: افحص التنفس والنبض فوراً وكن جاهزاً لتطبيق الـ CPR في ثوانٍ.</div></div>
+          <div class="caution-note">⚠️ التيارات الكهربائية غالباً تسبب توقفاً مفاجئاً لرجفان البطين القلبي حتى لو لم تظهر حروق خارجية.</div>
+        </div>
+      </article>
+
+      <!-- 13. الغرق وإنقاذ مجرى التنفس -->
+      <article class="case-card" data-category="respiratory" 
+        data-keywords="غرق مسبح بحر غريق موية بالرئة شرب ماء بلع ماء غاطس بالمسبح طفل طاح بالمسبح انقاذ غريق اختناق بالماء شرقان ماء تنفس صناعي">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🏊</span>
+            <span>حالات الغرق وإنقاذ التنفس (Drowning)</span>
+            <span class="case-badge-tag">تنفسية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">أخرج المصاب من الماء بأمان مع الحرص الشديد على عدم ثني الرقبة لاحتمال وجود كسر عنقي.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إن لم يكن يتنفس: ابدأ بـ 5 أنفاس إنقاذية أولاً، ثم باشر دورات الـ CPR (30 ضغطة ونَفَسَيْن).</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">انزع الملابس المبتلة وجفف جسده وغطه ببطانية جافة لتفادي هبوط الحرارة.</div></div>
+          <div class="caution-note">⚠️ لا تضيع الوقت في محاولة إخراج الماء من بطنه بالضغط؛ ابدأ الإنعاش القلبي الرئوي فوراً.</div>
+        </div>
+      </article>
+
+      <!-- 14. الصدمة التحسسية المفرطة -->
+      <article class="case-card" data-category="respiratory" 
+        data-keywords="حساسية صدمة تحسسية انافيلاكسيس حقنة ايبينفرين بنسلين مكسرات حساسية فول سوداني لدغة نحل انتفاخ الحلق والشفتين طفح جلدي احمرار ضيق شديد بالحلق">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>💉</span>
+            <span>الصدمة التحسسية المفرطة (Anaphylaxis)</span>
+            <span class="case-badge-tag">تنفسية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">ابحث فوراً مع المصاب عن قلم حقن الإبينفرين الذاتي (EpiPen) واحقنه في منتصف الفخذ الخارجي.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">اتصل بالإسعاف (997) فوراً واذكر بوضوح وجود صدمة حساسية مفرطة مهددة للتنفس.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">اجعل المصاب يستلقي على ظهره وارفع رجليه للأعلى لتحسين ضغط الدم؛ واجعله يجلس إن تعسر تنفسه.</div></div>
+          <div class="caution-note">⚠️ لا تجعله يقف أو يمشي؛ هبوط الضغط الحاد قد يؤدي للوفاة السريعة.</div>
+        </div>
+      </article>
+
+      <!-- 15. نوبة الربو وضيق التنفس -->
+      <article class="case-card" data-category="respiratory" 
+        data-keywords="ربو بخاخ فنتولين كتمة صدر صفير تنفس ازمة ربوية صدر مقفول زفير صعب حساسية صدر سعال متواصل ما يقدر يكمل جملة بخاخ ازرق">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>💨</span>
+            <span>نوبة الربو الحادة (Asthma Attack)</span>
+            <span class="case-badge-tag">تنفسية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">أجلس المريض في وضعية مستقيمة للأمام وساعده على أخذ 4 بخات من بخاخ التوسيع (الفنتولين) بفارق دقيقة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إذا لم تتحسن الأعراض بعد 4 دقائق: أعطه 4 بخات أخرى وكرر ذلك حتى وصول الإسعاف.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">اطلب الإسعاف فوراً (997) إذا عجز المصاب عن نطق جملة واحدة أو ازرقت أطرافه.</div></div>
+          <div class="caution-note">⚠️ لا تجعل مريض نوبة الربو يستلقي أبداً؛ الاستلقاء يضغط الحجاب الحاجز ويزيد الاختناق.</div>
+        </div>
+      </article>
+
+      <!-- 16. الرعاف والنزيف الأنفي -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="رعاف نزيف انف دم من الانف يقطر دم من خشمه صدمة بالوجه خشم ينزف اوعية انفية حرارة بالانف ضربة على الانف كدمة انف">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>👃</span>
+            <span>الرعاف والنزيف الأنفي (Nosebleed)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">انحنِ بالرأس للأمام قليلاً وليس للخلف إطلاقاً لمنع رجوع الدم للحلق والمعدة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">اضغط بإصبعيك على الجزء اللحمي اللين من الأنف تحت العظم مباشرة لمدة 10 دقائق متواصلة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">تنفس من الفم وضع كمادة باردة على جسر الأنف وأعلى الجبين لتضييق الشعيرات.</div></div>
+          <div class="caution-note">⚠️ إذا استمر النزيف أكثر من 20 دقيقة أو أعقب ضربة رأس قوية يجب التوجه للطوارئ.</div>
+        </div>
+      </article>
+
+      <!-- 17. بتر الأطراف أو الأصابع -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="بتر اصبع مقطوع يد مقطوعة عضو مبتور قص منشار قطاعة الة حادة لحام اصبع طار حفظ الطرف المبتور ثلج كيس شاش">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>✂️</span>
+            <span>بتر الأطراف والأصابع (Amputation)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">أوقف النزيف في طرف المصاب بالضغط المباشر الشديد واستخدام رباط ضاغط فوراً وسجل الوقت.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">لف الجزء المبتور بقماش شاش معقم نظيف ومبلل قليلاً ثم ضعه في كيس بلاستيكي محكم الإغلاق.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">ضع هذا الكيس داخل كيس آخر يحتوي على ماء وثلج (تبريد غير مباشر).</div></div>
+          <div class="caution-note">⚠️ لا تضع العضو المبتور مباشرة فوق الثلج أو في الماء المجرد؛ فذلك يقتل الخلايا ويمنع إعادة وصلها جراحياً.</div>
+        </div>
+      </article>
+
+      <!-- 18. إصابات العين والكيماويات -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="عين كلور بالعين صابون بالعين مادة كيميائية في العين شظية بالعين جرح بالعين قزازة بالعين عمى غسيل العين حرق كيميائي بالعين">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>👁️</span>
+            <span>دخول أجسام وكيماويات في العين (Eye Injury)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">في حالة الكيماويات والمنظفات: اغسل العين بماء جارٍ نظيف ومستمر لمدة 15 إلى 20 دقيقة فوراً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">في حالة الشظايا المنغرسة: لا تفرك العين ولا تحاول نزع الجسم العالق إطلاقاً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">غطِّ العين بكوب ورقي لحمايتها دون ملامستها، واطلب من المصاب إبقاء العينين ساكنتين.</div></div>
+          <div class="caution-note">⚠️ فرك العين عند وجود شظايا زجاجية أو معدنية يمزق القرنية ويحدث تلفاً دائماً بالبصر.</div>
+        </div>
+      </article>
+
+      <!-- 19. هبوط حرارة الجسم الشديد -->
+      <article class="case-card" data-category="environmental" 
+        data-keywords="برودة تجمد هبوط حرارة ثلج برد قارس ارتجاف شديد شحوب برودة جلد ارتباك بردي هيبوثيرميا برد صحراء شتاء متجمد">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>❄️</span>
+            <span>انخفاض حرارة الجسم الشديد (Hypothermia)</span>
+            <span class="case-badge-tag">بيئية وحرارية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">انقل المصاب لبيئة دافئة وانزع أي ملابس مبللة وجفف جسده بسرعة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">لفه بطبقات من البطانيات الجافة مع تدفئة الجذع والصدر والرقبة أولاً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">قدّم له مشروبات دافئة وسكرية فقط إذا كان واعياً وقادراً على البلع بوضوح.</div></div>
+          <div class="caution-note">⚠️ لا تفرك أطرافه المتجمدة ولا تعرضه لحرارة مدفأة مباشرة مفاجئة؛ تفادياً لحدوث اضطراب بنبض القلب.</div>
+        </div>
+      </article>
+
+      <!-- 20. الاختناق بالدخان والغاز -->
+      <article class="case-card" data-category="respiratory" 
+        data-keywords="دخان غاز حريق اول اكسيد الكربون خنقة اختناق بالدخان فحم دفاية غاز تسريب غاز صخام دوخة غاز كتمة حريق">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🌫️</span>
+            <span>استنشاق الدخان وغاز أول أكسيد الكربون</span>
+            <span class="case-badge-tag">تنفسية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">أخرج المصاب فوراً إلى الهواء النقي الطلق دون تعريض نفسك للخطر.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">فك الملابس الضاغطة حول الرقبة والصدر وافحص مجرى الهواء.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">اطلب الدفاع المدني (998) والإسعاف (997) وكن مستعداً لإنعاش الصدر.</div></div>
+          <div class="caution-note">⚠️ غاز أول أكسيد الكربون الصادر عن الفحم والدفايات عديم الرائحة واللون وقاتل صامت؛ تهوية المكان هي الخطوة الأولى.</div>
+        </div>
+      </article>
+
+      <!-- 21. ضربات الرأس وارتجاج الدماغ -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="ضربة رأس طيحة على الرأس ارتجاج مخ غيبوبة تقيؤ بعد الضربة دوخة فقدان ذاكرة حادث خبطة رأس دم من الاذن طفل طاح على راسه">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🤕</span>
+            <span>ضربات الرأس وارتجاج الدماغ (Head Trauma)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">ثبّت رأس وعنق المصاب في خط مستقيم وتجنب تحريكه مطلقاً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">راقب علامات الخطر: تقيؤ متكرر، فقدان وعي ولو لثوانٍ، خروج سائل مائي أو دم من الأذن أو الأنف.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">ضع كمادة باردة ملفوفة بقماش فوق موضع الكدمة دون الضغط على عظام الجمجمة.</div></div>
+          <div class="caution-note">⚠️ لا تسمح للمصاب بالنوم دون فحص استجابته دورياً، وتوجه للطوارئ فوراً إذا ظهر تلعثم أو تشوش.</div>
+        </div>
+      </article>
+
+      <!-- 22. سقوط وتخلخل الأسنان -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="سن طايح سن مكسور ضرس طاح خلع سن بالضربة طيحة على الفم نزيف لثة سن مقلوع حفظ السن حليب">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🦷</span>
+            <span>سقوط وتخلخل الأسنان جراء صدمة (Avulsed Tooth)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">امسك السن من التاج الأبيض فقط وتجنب تماماً لمس جذر السن أو فركه.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إذا كان متسخاً اشطفه بلطف بحليب بارد أو محلول ملحي دون كشطه.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">احفظ السن في كوب حليب سائل أو لعاب المصاب وتوجه لطبيب الأسنان خلال ساعة واحدة لإنقاذ السن.</div></div>
+          <div class="caution-note">⚠️ لا تحفظ السن في ماء صنبور عادي؛ فالماء العذب يسبب تمزق خلايا غشاء الجذر الحيوي.</div>
+        </div>
+      </article>
+
+      <!-- 23. الإغماء وفقدان الوعي المؤقت -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="اغماء اغمي عليه دايخ غاب عن الوعي طاح فجأة غشاوة هبوط ضغط وقوف طويل شحوب سينكوب فاقد الوعي صحصح">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>😵</span>
+            <span>الإغماء وفقدان الوعي المؤقت (Syncope)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">اجعل المصاب يستلقي على ظهره وارفع رجليه بمقدار 30 سم عن الأرض لتدفق الدم للدماغ.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">فك الأزرار والياقة المشدودة وافتح النوافذ لتهوية المكان فوراً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">إذا لم يستعد الوعي خلال دقيقة واحدة، ضعه في وضعية الإفاقة الجانبية واطلب الإسعاف 997.</div></div>
+          <div class="caution-note">⚠️ لا تجلس المصاب فور إفاقته بسرعة؛ دعه يستلقي 10 دقائق لتجنب تجدد نوبة الإغماء والسقوط.</div>
+        </div>
+      </article>
+
+      <!-- 24. نوبات الهلع وفرط التنفس -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="هلع رعب خوف شديد نوبة هلع بكاء ارتعاش تنفس سريع فرط تنفس بانيك اتاك خفقان الموت خوف مفاجئ تنميل اطراف">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🫀</span>
+            <span>نوبات الهلع وفرط التنفس (Panic Attack)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">طمئن المصاب بصوت هادئ وثابت وأكد له أنه بأمان والأعراض ستزول بعد دقائق.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">وجّهه لتقنية التنفس البطيء: شهيق من الأنف في 4 ثوانٍ، حبس النفس لثانيتين، زفير بطيء في 6 ثوانٍ.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">ساعده على تشتيت التركيز برصد 5 أشياء يراها حوله و4 أشياء يلمسها بيده.</div></div>
+          <div class="caution-note">⚠️ لا تستخدم الأكياس الورقية للتنفس نهائياً؛ فقد تكون الأعراض ناتجة عن ذبحة صدرية أو ربو وتسبب نقص أكسجين خطيراً.</div>
+        </div>
+      </article>
+
+      <!-- 25. لدغات قناديل البحر والكائنات البحرية -->
+      <article class="case-card" data-category="environmental" 
+        data-keywords="قنديل بحر لدغة قنديل سمكة صخرية شوكة سمك بحر شاطئ حرقان جلد لسعة قنديل حكة بحر ماء مالح خل لسعة بحرية">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🪼</span>
+            <span>لدغات قناديل البحر والكائنات البحرية (Jellyfish Stings)</span>
+            <span class="case-badge-tag">بيئية وحرارية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">اشطف موضع اللدغة فوراً بخل طعام مخفف أو ماء البحر المالح لتعطيل كبسولات السم.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">أزل المجسات المرئية العالقة بملقط أو بطاقة بلاستيكية دون لمسها بيدك.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">اغمر العضو المصاب في ماء ساخن قدر التحمل (40-45 مئوية) لمدة 20 دقيقة لتفكيك بروتين السم.</div></div>
+          <div class="caution-note">⚠️ لا تغسل موضع اللسعة بماء عذب نقي ولا تفركه بالرمل؛ الماء العذب يفجر خلايا السم فوراً ويزيد الألم.</div>
+        </div>
+      </article>
+
+      <!-- 26. الإنعاش القلبي الرئوي للبالغين -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="انعاش قلبي رئوي سي بي ار cpr توقف قلب توقف القلب ما يتنفس ما فيه نبض ضغطات الصدر تنفس صناعي فاقد وعي ما يستجيب جهاز صدمات aed">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🫀</span>
+            <span>الإنعاش القلبي الرئوي للبالغين (CPR)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">تأكد من أمان المكان، ثم هزّ كتف المصاب ونادِه بصوت عالٍ؛ إن لم يستجب ولا يتنفس بشكل طبيعي اتصل بالإسعاف (997) واطلب جهاز الصدمات (AED) إن وُجد.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">ضع كعب يدك في منتصف الصدر واضغط بعمق 5 - 6 سم بمعدل 100 - 120 ضغطة في الدقيقة، مع ترك الصدر يرتد كاملاً بين الضغطات.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">بعد كل 30 ضغطة أعطِ نَفَسَيْن إنقاذيين (إن كنت مدرباً) مع إمالة الرأس للخلف ورفع الذقن، ثم عُد للضغطات دون تأخير.</div></div>
+          <div class="caution-note">⚠️ لا توقف الإنعاش إلا إذا عاد المصاب للتنفس، أو وصل الإسعاف، أو أنهكك التعب. إن لم تكن مدرباً على التنفس الإنقاذي فاكتفِ بالضغطات المتواصلة.</div>
+        </div>
+      </article>
+
+      <!-- 27. الالتواء والإصابات الرياضية -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="التواء كاحل التوى رجلي التواء قدم رباط متمزق شد عضلي ورم تورم رياضة لعب كورة طحت على رجلي ركبة تورمت كدمة زرقاء مفصل">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🦶</span>
+            <span>الالتواء والشد العضلي (Sprains & Strains)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">أوقف النشاط فوراً وأرح المفصل المصاب ولا تحمّل عليه وزنك.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">ضع كمادة باردة ملفوفة بقماش على الموضع 15 - 20 دقيقة كل ساعتين تقريباً خلال أول 48 ساعة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">لف المفصل بضماد مرن بضغط معتدل غير مشدود، وارفع الطرف أعلى من مستوى القلب لتقليل التورم.</div></div>
+          <div class="caution-note">⚠️ إذا ظهر تشوه بالمفصل، أو تعذّر الوقوف عليه، أو حدث تنميل أو ازرقاق بالأصابع فاعتبرها كسراً وتوجه للطوارئ. لا تدلّك الموضع.</div>
+        </div>
+      </article>
+
+      <!-- 28. الصدمة وهبوط الدورة الدموية -->
+      <article class="case-card" data-category="cardio" 
+        data-keywords="صدمة هبوط حاد ضغط شحوب جلد بارد رطب نبض سريع ضعيف نزيف داخلي تعرق بارد ارتباك عطش شديد تنفس سريع صدمة نزفية">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>📉</span>
+            <span>الصدمة وهبوط الدورة الدموية (Shock)</span>
+            <span class="case-badge-tag">قلب وأعصاب</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">اطلب الإسعاف (997) فوراً، وأوقف أي نزيف ظاهر بالضغط المباشر.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">أرقد المصاب على ظهره وارفع رجليه نحو 30 سم إن لم يكن هناك اشتباه بإصابة في الرأس أو العمود الفقري أو كسر بالساقين.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">غطّه ببطانية خفيفة للحفاظ على حرارته، وفك الملابس الضاغطة، وراقب تنفسه ووعيه باستمرار.</div></div>
+          <div class="caution-note">⚠️ لا تعطِ المصاب أي طعام أو شراب حتى لو اشتكى من العطش؛ قد يحتاج لعملية عاجلة.</div>
+        </div>
+      </article>
+
+      <!-- 29. إصابات الصدر والجروح النافذة -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="جرح بالصدر طعنة بالصدر رصاصة صدر ضلوع مكسورة كسر ضلع رئة ثقب بالصدر صوت هواء من الجرح ضيق تنفس بعد حادث ضربة على الصدر">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🫁</span>
+            <span>إصابات الصدر والجروح النافذة (Chest Injury)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">اطلب الإسعاف (997) فوراً وأبقِ المصاب هادئاً، وأجلسه في وضعية نصف جالس إن كان واعياً.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إذا كان الجرح يسحب الهواء: غطِّه بقطعة بلاستيك أو رقاقة نظيفة ولصّقها من ثلاث جهات فقط وأبقِ جهة واحدة مفتوحة، أو اضغط عليه بكفك مغطاة بقفاز.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">في حال كسر الضلوع دعه يسند صدره بوسادة أو ذراعه دون ربط الصدر بإحكام، وراقب تنفسه.</div></div>
+          <div class="caution-note">⚠️ لا تنزع أي جسم مغروس بالصدر، ولا تغلق الجرح من الجهات الأربع؛ فذلك قد يحبس الهواء ويسبب انهيار الرئة.</div>
+        </div>
+      </article>
+
+      <!-- 30. عضات الحيوانات -->
+      <article class="case-card" data-category="environmental" 
+        data-keywords="عضة كلب عضة قطة عضه حيوان كلب مسعور عضني كلب خدش قط سعار داء الكلب عضة حمار عضة جمل عضة انسان انياب جرح عضة">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🐕</span>
+            <span>عضات الحيوانات (Animal Bites)</span>
+            <span class="case-badge-tag">بيئية وحرارية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">ابتعد عن الحيوان فوراً إلى مكان آمن، ثم اغسل الجرح بالماء الجاري والصابون لمدة 15 دقيقة على الأقل.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إن كان هناك نزيف اضغط عليه بشاش نظيف حتى يتوقف، ثم غطِّ الجرح بضمادة معقمة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">توجه للمستشفى أو المركز الصحي في نفس اليوم لتقييم الحاجة إلى مصل داء الكلب ولقاح الكزاز (التيتانوس)، وأبلغهم بنوع الحيوان وهل كان مألوفاً أم شارداً.</div></div>
+          <div class="caution-note">⚠️ لا تخيّط الجرح ولا تغلقه بإحكام في البيت، ولا تحاول الإمساك بالحيوان؛ حتى لو بدت العضة صغيرة فهي تحتاج تقييماً طبياً.</div>
+        </div>
+      </article>
+
+      <!-- 31. دخول جسم غريب في الأذن أو الأنف -->
+      <article class="case-card" data-category="trauma" 
+        data-keywords="جسم غريب بالاذن جسم غريب بالانف حشرة بالاذن حبة بالانف طفل دخل خرزة بالانف بطارية زر مغناطيس بالانف شي بالاذن صرصور بالاذن ألم اذن">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>👂</span>
+            <span>جسم غريب في الأذن أو الأنف (Foreign Body)</span>
+            <span class="case-badge-tag">حوادث</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">أبقِ المصاب هادئاً، وإن كان الجسم في الأنف فاطلب منه التنفس من الفم وعدم الشهيق بقوة من الأنف.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">إن كان في الأذن: أمِل الرأس نحو الجهة المصابة ليخرج الجسم بتأثير الجاذبية، ويمكن هزّ الرأس برفق.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">إن لم يخرج بسهولة توجه للطوارئ، وبشكل عاجل جداً إذا كان الجسم بطارية زر أو مغناطيساً أو يسبب ألماً أو نزفاً.</div></div>
+          <div class="caution-note">⚠️ لا تستخدم الملقط أو أعواد القطن أو الدبابيس لإخراجه؛ فقد تدفعه للداخل وتؤذي طبلة الأذن أو الأنسجة.</div>
+        </div>
+      </article>
+
+      <!-- 32. ارتفاع الحرارة عند الأطفال -->
+      <article class="case-card" data-category="internal" 
+        data-keywords="حمى سخونة حرارة طفل حرارة مرتفعة بدن حار الولد سخن حرارة عالية رضيع حمى ترمومتر قشعريرة طفل محموم حرارة 39 عرق">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🌡️</span>
+            <span>ارتفاع الحرارة والحمى عند الأطفال (Fever)</span>
+            <span class="case-badge-tag">باطنية وتسمم</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">قِس الحرارة بميزان دقيق، وألبس الطفل ملابس خفيفة وأبقِ الغرفة معتدلة التهوية.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">أعطه سوائل بكثرة وبكميات صغيرة متكررة، ويمكن مسح جسمه بإسفنجة مبللة بماء فاتر.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">إذا احتجت خافضاً للحرارة فاتبع الجرعة المكتوبة على العبوة حسب وزن الطفل أو استشر الصيدلي أو الطبيب.</div></div>
+          <div class="caution-note">⚠️ توجه للطوارئ فوراً إذا كان عمر الرضيع أقل من 3 أشهر وحرارته 38 فأكثر، أو ظهر تشنج، أو تيبّس بالرقبة، أو طفح لا يختفي بالضغط، أو خمول شديد. لا تستخدم الماء البارد أو الكحول، ولا تعطِ الأسبرين للأطفال.</div>
+        </div>
+      </article>
+
+      <!-- 33. التسمم الغذائي والجفاف -->
+      <article class="case-card" data-category="internal" 
+        data-keywords="تسمم غذائي اسهال استفراغ مغص جفاف بطن وجع بطن اكل فاسد قيء متكرر اسهال شديد ملح معالجة الجفاف ماء بعد اكل مطعم ما يبول جفاف الفم">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🤢</span>
+            <span>التسمم الغذائي والجفاف (Food Poisoning & Dehydration)</span>
+            <span class="case-badge-tag">باطنية وتسمم</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">عوّض السوائل بجرعات صغيرة متكررة (رشفات) من محلول معالجة الجفاف الفموي (أملاح الإماهة) أو ماء نظيف.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">أوقف الأكل الصلب حتى يهدأ القيء، ثم ابدأ بأطعمة خفيفة كالأرز والموز والخبز المحمص.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">راقب علامات الجفاف: جفاف الفم، قلة البول أو انعدامه، دوخة، غؤور العينين عند الأطفال.</div></div>
+          <div class="caution-note">⚠️ توجه للطوارئ إذا وُجد دم في البراز أو القيء، أو حرارة عالية، أو استمر القيء أكثر من يوم، أو كان المصاب رضيعاً أو مسناً أو لم يبل منذ 8 ساعات. لا تتناول موقفات الإسهال دون استشارة الطبيب.</div>
+        </div>
+      </article>
+
+      <!-- 34. الإجهاد الحراري وتشنجات الحر -->
+      <article class="case-card" data-category="environmental" 
+        data-keywords="اجهاد حراري تشنج عضلي حر شد عضلات من الحر تعرق دوخة صداع حر حج مشاعر عطش ارهاق شمس اعياء حراري غثيان حرارة ضعف عام">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🥵</span>
+            <span>الإجهاد الحراري وتشنجات الحر (Heat Exhaustion)</span>
+            <span class="case-badge-tag">بيئية وحرارية</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">انقل المصاب فوراً إلى مكان مظلل أو مكيف، وأرقده وارفع رجليه قليلاً، وفك الملابس الضيقة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">أعطه ماءً بارداً أو مشروباً يحتوي أملاحاً على رشفات إن كان واعياً ولا يتقيأ.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">برّد جسمه بمنشفة مبللة أو رذاذ ماء مع التهوية، ودلّك العضلات المتشنجة برفق.</div></div>
+          <div class="caution-note">⚠️ إذا تشوش وعيه أو توقف التعرق وصار الجلد حاراً وجافاً أو لم يتحسن خلال 30 دقيقة فهي ضربة شمس: اطلب الإسعاف 997 فوراً. لا تعطِه أقراص الملح.</div>
+        </div>
+      </article>
+
+      <!-- 35. الولادة الطارئة -->
+      <article class="case-card" data-category="internal" 
+        data-keywords="ولادة طارئة ولادة مخاض طلق حامل تبي تولد المولود راس الجنين نزول المية ماي الرأس ظهر طلقة طلق ولادة بالسيارة حبل سري مشيمة بنت حامل">
+        <div class="case-header" onclick="toggleAccordion(this)">
+          <div class="case-title-wrap">
+            <span>🤰</span>
+            <span>الولادة الطارئة خارج المستشفى (Emergency Childbirth)</span>
+            <span class="case-badge-tag">باطنية وتسمم</span>
+          </div>
+          <span class="case-arrow">▼</span>
+        </div>
+        <div class="case-body">
+          <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">اتصل بالإسعاف (997) فوراً، وأرقد الأم على ظهرها مع ثني ركبتيها وإسنادها بوسائد، وحضّر مناشف أو أقمشة نظيفة.</div></div>
+          <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">عند ظهور رأس المولود اسند الرأس بلطف دون شدّ أو سحب، واطلب من الأم التنفس بهدوء وعدم الدفع القسري عند الإرشاد.</div></div>
+          <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">بعد خروجه جفف جسمه وامسح فمه وأنفه، وضعه على صدر الأم ملامساً لجلدها، وغطِّهما معاً ببطانية.</div></div>
+          <div class="caution-note">⚠️ لا تسحب المولود ولا الحبل السري، ولا تقصّ الحبل؛ اتركه للمسعف. وإن التف الحبل حول عنق المولود فارخِه برفق فقط.</div>
+        </div>
+      </article>
+
+    </div>
+
+    <button class="config-trigger" onclick="setupApiKey()">⚙️ إعدادات Gemini API السحابية (اختياري)</button>
+  </main>
+
+  <!-- ربط ملف الجافاسكريبت الخارجي -->
+  <script src="script.js"></script>
+</body>
+</html>
